@@ -1,8 +1,22 @@
 import json
 import boto3
 
+"""Batch event Lambda function.
+
+This module processes batch events from API Gateway, flattens parameters,
+and sends the data to an Amazon Kinesis stream.
+"""
+
 
 def putDataToKinesis(payloadData):
+    """Send data to Kinesis stream.
+
+    Args:
+        payloadData (dict): The data payload to send.
+
+    Returns:
+        dict: The response from Kinesis put_record.
+    """
     kinesis = boto3.client("kinesis")
     response = kinesis.put_record(
         StreamName="firstStream",
@@ -13,6 +27,15 @@ def putDataToKinesis(payloadData):
 
 
 def paramFlattenFunction(paramArray, resObj):
+    """Flatten parameter array into the result object.
+
+    Args:
+        paramArray (list): List of parameter dictionaries.
+        resObj (dict): The result object to update.
+
+    Returns:
+        dict: The updated result object with flattened parameters.
+    """
     count = 0
     for rows in paramArray:
         resObj['key_' + str(count)] = rows['key']
@@ -25,6 +48,14 @@ def paramFlattenFunction(paramArray, resObj):
 
 
 def post_data_handler(event):
+    """Handle POST data from the event.
+
+    Args:
+        event (dict): The event data from API Gateway.
+
+    Returns:
+        dict: Processed payload data or error response.
+    """
     resObj = {}
     # parse query string param
     if event['httpMethod'] == "POST":
@@ -69,6 +100,15 @@ def post_data_handler(event):
 
 
 def lambda_handler(event, context):
+    """Main Lambda handler for batch events.
+
+    Args:
+        event (dict): The Lambda event containing batch data.
+        context: The Lambda context object.
+
+    Returns:
+        dict: Response with status code and body.
+    """
     try:
         payloadArray = event['data']
         elementCount = 0

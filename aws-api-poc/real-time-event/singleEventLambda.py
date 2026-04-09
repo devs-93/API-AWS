@@ -1,8 +1,22 @@
 import json
 import boto3
 
+"""Real-time single event Lambda function.
+
+This module processes individual real-time events from API Gateway,
+flattens parameters, and sends the data to an Amazon Kinesis stream.
+"""
+
 
 def putDataToKinesis(payloadData):
+    """Send data to Kinesis stream.
+
+    Args:
+        payloadData (dict): The data payload to send.
+
+    Returns:
+        dict: The response from Kinesis put_record.
+    """
     kinesis = boto3.client("kinesis")
     response = kinesis.put_record(
         StreamName="firstStream",
@@ -13,6 +27,15 @@ def putDataToKinesis(payloadData):
 
 
 def paramFlattenFunction(paramArray, resObj):
+    """Flatten parameter array into the result object.
+
+    Args:
+        paramArray (list): List of parameter dictionaries.
+        resObj (dict): The result object to update.
+
+    Returns:
+        dict: The updated result object with flattened parameters.
+    """
     count = 0
     for rows in paramArray:
         resObj['key_' + str(count)] = rows['key']
@@ -25,6 +48,15 @@ def paramFlattenFunction(paramArray, resObj):
 
 
 def lambda_handler(event, context):
+    """Main Lambda handler for real-time single events.
+
+    Args:
+        event (dict): The Lambda event containing event data.
+        context: The Lambda context object.
+
+    Returns:
+        dict: Response with status code and body.
+    """
     resObj = {}
     # parse query string param
     if event['httpMethod'] == "POST":
