@@ -10,7 +10,6 @@ and sends the data to an Amazon Kinesis stream.
 
 def putDataToKinesis(payloadData):
     """Send data to Kinesis stream.
-
     Args:
         payloadData (dict): The data payload to send.
 
